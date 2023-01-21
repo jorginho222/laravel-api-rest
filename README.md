@@ -12,7 +12,7 @@ php artisan make:controller CourseController --model=Course --api --test --reque
 ### Create migration
 php artisan make:migration create_courses_table
 
-### Run the migration in enviroment testing. Don't forget to create the env.testing file 
+### Run the migration in enviroment testing. Don't forget to create the env.testing file with test database
 sail artisan --env=testing migrate      
 #### * (1)
 
