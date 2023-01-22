@@ -19,6 +19,7 @@ class CourseControllerTest extends TestCase
         $course = new Course();
         $course->name = fake('pt_ES')->name();
         $course->description = fake('pt_ES')->text(255);
+        $course->area = fake('pt_ES')->text(60);
         $course->price = fake()->randomFloat(2, 0, 10000);
         $course->max_students = rand(0, 100);
 
@@ -38,6 +39,7 @@ class CourseControllerTest extends TestCase
     {
         $course = Course::query()->inRandomOrder()->first();
         $course->name = fake('pt_ES')->name();
+        $course->area = fake('pt_ES')->text(60);
         $course->price = fake()->randomFloat(2, 0, 10000);
 
         $response = $this->put("/api/course/{$course->id}", $course->toArray());

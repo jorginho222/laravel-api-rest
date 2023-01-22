@@ -14,6 +14,7 @@ class Course extends Model
         'name',
         'description',
         'max_students',
+        'area',
         'price',
     ];
 }

@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FilterByAreaRequest;
+use App\Http\Requests\FilterRequest;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use App\Models\Course;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
@@ -14,7 +18,7 @@ class CourseController extends Controller
      */
     public function index(): Response
     {
-        return response(Course::all(), 200) ;
+        return response(Course::all(), 200);
     }
 
     /**
@@ -51,4 +55,27 @@ class CourseController extends Controller
         $course->delete();
         return \response(null, 204);
     }
+
+    /**
+     * Apply all the filters
+     */
+    public function filter(FilterRequest $request): Response
+    {
+        $criterias = $request->validated();
+
+        $filtered = Course::query()
+            ->where('area', '=', $criterias['area'])
+            ->where('price', '<=', $criterias['price'])->get();
+
+        return \response($filtered, 200);
+    }
+
+    /**
+     * Filter courses by area
+     */
+    public function filterByArea($areaCriteria): Collection
+    {
+        return Course::query()->where('area', '=', $areaCriteria)->get();
+    }
+
 }

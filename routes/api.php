@@ -20,3 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource('course', CourseController::class);
+
+Route::post('course/filter/area', [CourseController::class, 'filterByArea']);
+
+Route::post('course/filter', [CourseController::class, 'filter']);
