@@ -64,18 +64,12 @@ class CourseController extends Controller
         $criterias = $request->validated();
 
         $filtered = Course::query()
-            ->where('area', '=', $criterias['area'])
-            ->where('price', '<=', $criterias['price'])->get();
+            ->where('area_id', '=', $criterias['areaId'])
+            ->where('price', '>=', $criterias['minPrice'])
+            ->where('price', '<=', $criterias['maxPrice'])->orderBy('price')->get();
 
         return \response($filtered, 200);
     }
 
-    /**
-     * Filter courses by area
-     */
-    public function filterByArea($areaCriteria): Collection
-    {
-        return Course::query()->where('area', '=', $areaCriteria)->get();
-    }
 
 }

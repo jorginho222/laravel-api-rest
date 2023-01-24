@@ -17,11 +17,13 @@ return new class extends Migration
             $table->id();
             $table->string('name', 60)->comment("Course name");
             $table->string('description', 255)->comment("Course description");
-            $table->string('area', 60)->comment("Course area");
             $table->integer('max_students')->nullable()->comment("Maximum students allowed");
             $table->float('price',7,2)->comment("Course price");
+            $table->bigInteger('area_id')->unsigned();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('area_id')->references('id')->on('areas');
         });
     }
 

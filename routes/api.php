@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AreaController;
 use App\Http\Controllers\CourseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,8 +20,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('course', CourseController::class);
+Route::apiResource('area', AreaController::class);
 
-Route::post('course/filter/area', [CourseController::class, 'filterByArea']);
+Route::apiResource('course', CourseController::class);
 
 Route::post('course/filter', [CourseController::class, 'filter']);

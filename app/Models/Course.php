@@ -14,7 +14,12 @@ class Course extends Model
         'name',
         'description',
         'max_students',
-        'area',
         'price',
+        'area_id',
     ];
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class, 'area_id');
+    }
 }
