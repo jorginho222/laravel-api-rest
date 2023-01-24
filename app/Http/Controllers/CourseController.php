@@ -70,6 +70,4 @@ class CourseController extends Controller
 
         return \response($filtered, 200);
     }
-
-
 }

@@ -65,8 +65,14 @@ class CourseControllerTest extends TestCase
 
         $maxPrice = Course::query()->orderBy('price', 'desc')->first();
 
+        $criterias = [
+          'areaId' => $randomArea->id,
+          'minPrice' => $minPrice,
+          'maxPrice' => $maxPrice,
+        ];
 
+        $response = $this->post('/api/course/filter', $criterias);
 
-        $response = $this->post('/api/filter', )
+        $response->assertStatus(200);
     }
 }
