@@ -75,4 +75,31 @@ class CourseControllerTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_course_enroll()
+    {
+        $randomCourse = Course::query()->inRandomOrder()->first();
+        $randomCourse->available_places = 1;
+        $randomCourse->is_full = false;
+        $randomCourse->save();
+
+        $response = $this->put("/api/course/{$randomCourse->id}/enroll");
+
+        $updatedCourse = $response->original;
+
+        $response->assertStatus(200);
+        $this->assertEquals(true, $updatedCourse->is_full);
+    }
+
+    public function test_fully_course_enroll()
+    {
+        $randomCourse = Course::query()->inRandomOrder()->first();
+        $randomCourse->is_full = true;
+        $randomCourse->save();
+
+        $response = $this->put("/api/course/{$randomCourse->id}/enroll");
+
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+
 }

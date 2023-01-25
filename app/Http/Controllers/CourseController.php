@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\FilterByAreaRequest;
 use App\Http\Requests\FilterRequest;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
+use App\Http\Requests\StoreRatingRequest;
 use App\Models\Course;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Response;
-use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
@@ -28,6 +26,11 @@ class CourseController extends Controller
     {
         $request->validated();
         $course = Course::query()->firstOrCreate($request->all());
+
+        $course->available_places = $course->max_students;
+
+        $course->save();
+
         return response($course, 201);
     }
 
@@ -69,5 +72,48 @@ class CourseController extends Controller
             ->where('price', '<=', $criterias['maxPrice'])->orderBy('price')->get();
 
         return \response($filtered, 200);
+    }
+
+    /**
+     *  Effectuates an enrollment
+     */
+    public function enroll(Course $course): Response
+    {
+        if ($course->is_full) {
+            abort(400, 'No hay cupo disponible para el curso: %s');
+        }
+
+        $course->available_places --;
+
+        if ($course->available_places === 0) {
+            $course->is_full = true;
+        }
+
+        $course->save();
+
+        return \response($course, 200);
+    }
+
+    public function rate(Course $course, StoreRatingRequest $request): Response
+    {
+        $request->validated();
+
+        $course->ratings()->firstOrCreate($request->all());
+
+        $count = $course->ratings->count();
+        $sum = $course->ratings->pluck('value')->sum();
+
+        $course->rating = $sum / $count;
+
+        $course->save();
+
+        return \response($course, 200);
+    }
+
+    public function getRatings(Course $course): Response
+    {
+        $ratings = $course->ratings;
+
+        return \response($ratings, 200);
     }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\RatingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,4 +25,11 @@ Route::apiResource('area', AreaController::class);
 
 Route::apiResource('course', CourseController::class);
 
+//Route::apiResource('rating', RatingController::class);
+
 Route::post('course/filter', [CourseController::class, 'filter']);
+
+Route::put('course/{course}/enroll', [CourseController::class, 'enroll']);
+
+Route::put('course/{course}/rate', [CourseController::class, 'rate']);
+Route::get('course/{course}/ratings', [CourseController::class, 'getRatings']);

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FilterByAreaRequest extends FormRequest
+class StoreRatingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,8 @@ class FilterByAreaRequest extends FormRequest
     public function rules()
     {
         return [
-            'area' => 'required|max:60'
+            'value' => 'required|min:1',
+            'comment' => 'nullable|max:500',
         ];
     }
 }

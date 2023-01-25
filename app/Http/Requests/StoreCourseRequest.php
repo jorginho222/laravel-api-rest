@@ -26,6 +26,7 @@ class StoreCourseRequest extends FormRequest
         return [
             'name' => 'required|max:60',
             'description' => 'required|max:255',
+            'max_students' => 'required|min:1',
             'price' => 'required|numeric|min:0|max:10000',
         ];
     }
