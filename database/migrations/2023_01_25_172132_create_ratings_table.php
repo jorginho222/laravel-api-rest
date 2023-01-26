@@ -18,9 +18,11 @@ return new class extends Migration
             $table->integer('value')->unsigned()->comment('Rating value');
             $table->string('comment', 500)->nullable()->comment('Some aditional comments');
             $table->uuid('course_id');
+            $table->uuid('user_id')->nullable();
             $table->timestamps();
 
             $table->foreign('course_id')->references('id')->on('courses');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

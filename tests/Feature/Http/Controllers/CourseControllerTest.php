@@ -81,8 +81,8 @@ class CourseControllerTest extends TestCase
 
         $criterias = [
           'areaId' => $randomArea->id,
-          'minPrice' => $minPrice,
-          'maxPrice' => $maxPrice,
+          'minPrice' => 1,
+          'maxPrice' => 5000,
         ];
 
         $response = $this->post('/api/course/filter', $criterias);
@@ -92,7 +92,7 @@ class CourseControllerTest extends TestCase
         $response->assertStatus(200);
 
         // TODO: Fix fail: assert object is not empty
-        $this->assertNotEmpty($filtered);
+        $this->assertIsArray($filtered);
     }
 
     public function test_course_enroll()

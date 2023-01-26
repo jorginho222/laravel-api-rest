@@ -7,6 +7,7 @@ use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use App\Http\Requests\StoreRatingRequest;
 use App\Models\Course;
+use App\Models\User;
 use Illuminate\Http\Response;
 
 class CourseController extends Controller
@@ -16,7 +17,7 @@ class CourseController extends Controller
      */
     public function index(): Response
     {
-        $orderedByRating = Course::query()->orderBy('rating', 'desc')->get();
+        $orderedByRating = Course::query()->with('ratings')->orderBy('rating', 'desc')->get();
 
         return response($orderedByRating->groupBy('area_id'), 200);
     }
@@ -71,7 +72,8 @@ class CourseController extends Controller
         $filtered = Course::query()
             ->where('area_id', '=', $criterias['areaId'])
             ->where('price', '>=', $criterias['minPrice'])
-            ->where('price', '<=', $criterias['maxPrice'])->orderBy('price')->get();
+            ->where('price', '<=', $criterias['maxPrice'])
+            ->orderBy('price')->get();
 
         return \response($filtered, 200);
     }
@@ -96,9 +98,14 @@ class CourseController extends Controller
         return \response($course, 200);
     }
 
+    /**
+     *  Rates a specified course
+     */
     public function rate(Course $course, StoreRatingRequest $request): Response
     {
         $request->validated();
+
+        User::query()->findOrFail($request->user_id);
 
         $course->ratings()->firstOrCreate($request->all());
 
@@ -112,6 +119,9 @@ class CourseController extends Controller
         return \response($course, 200);
     }
 
+    /**
+     *  Get ratings for a specified course
+     */
     public function getRatings(Course $course): Response
     {
         $ratings = $course->ratings;
