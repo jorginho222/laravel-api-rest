@@ -5,6 +5,7 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Area;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class AreaControllerTest extends TestCase
@@ -19,10 +20,14 @@ class AreaControllerTest extends TestCase
     public function test_area_store()
     {
         $area = new Area();
+        $area->id = (string) Str::orderedUuid();
         $area->description = fake('pt_ES')->text(60);
 
         $response = $this->post('/api/area', $area->toArray());
+        $createdArea = $response->original;
+
         $response->assertStatus(201);
+        $this->assertEquals($area->id, $createdArea->id);
     }
 
     public function test_area_show()
@@ -42,7 +47,10 @@ class AreaControllerTest extends TestCase
 
         $response = $this->put("/api/area/{$randomArea->id}", $randomArea->toArray());
 
+        $updatedArea = $response->original;
+
         $response->assertStatus(200);
+        $this->assertEquals($randomArea->description, $updatedArea->description);
     }
 
     public function test_area_destroy()

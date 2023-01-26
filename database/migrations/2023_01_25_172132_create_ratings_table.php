@@ -14,10 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('ratings', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->integer('value')->unsigned()->comment('Rating value');
             $table->string('comment', 500)->nullable()->comment('Some aditional comments');
-            $table->bigInteger('course_id')->unsigned();
+            $table->uuid('course_id');
             $table->timestamps();
 
             $table->foreign('course_id')->references('id')->on('courses');

@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('courses', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('name', 60)->comment("Course name");
             $table->string('description', 255)->comment("Course description");
             $table->integer('max_students')->comment("Maximum students allowed");
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->boolean('is_full')->default(false)->comment('There are not available places');
             $table->float('price',7,2)->comment("Course price");
             $table->float('rating')->default(0)->comment("Course average rating");
-            $table->bigInteger('area_id')->unsigned();
+            $table->uuid('area_id');
             $table->softDeletes();
             $table->timestamps();
 

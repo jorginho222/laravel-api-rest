@@ -16,7 +16,9 @@ class CourseController extends Controller
      */
     public function index(): Response
     {
-        return response(Course::all(), 200);
+        $orderedByRating = Course::query()->orderBy('rating', 'desc')->get();
+
+        return response($orderedByRating->groupBy('area_id'), 200);
     }
 
     /**
@@ -80,7 +82,7 @@ class CourseController extends Controller
     public function enroll(Course $course): Response
     {
         if ($course->is_full) {
-            abort(400, 'No hay cupo disponible para el curso: %s');
+            abort(400, sprintf('No hay cupo disponible para el curso: %s', $course->name));
         }
 
         $course->available_places --;

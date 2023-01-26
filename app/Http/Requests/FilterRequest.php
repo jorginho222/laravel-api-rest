@@ -25,8 +25,8 @@ class FilterRequest extends FormRequest
     {
         return [
             'areaId' => 'required',
-            'minPrice' => 'required|min:1|max:100000',
-            'maxPrice' => 'required|min:1|max:100000',
+            'minPrice' => 'required|numeric|min:1|max:100000',
+            'maxPrice' => 'required|numeric|min:1|max:100000',
         ];
     }
 }
