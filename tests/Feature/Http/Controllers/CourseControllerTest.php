@@ -5,6 +5,7 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Area;
 use App\Models\Course;
 use App\Models\Rating;
+use App\Models\User;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -81,8 +82,8 @@ class CourseControllerTest extends TestCase
 
         $criterias = [
           'areaId' => $randomArea->id,
-          'minPrice' => 1,
-          'maxPrice' => 5000,
+          'minPrice' => $minPrice,
+          'maxPrice' => $maxPrice,
         ];
 
         $response = $this->post('/api/course/filter', $criterias);
@@ -92,7 +93,7 @@ class CourseControllerTest extends TestCase
         $response->assertStatus(200);
 
         // TODO: Fix fail: assert object is not empty
-        $this->assertIsArray($filtered);
+        $this->assertNotEmpty($filtered);
     }
 
     public function test_course_enroll()
@@ -124,11 +125,13 @@ class CourseControllerTest extends TestCase
     public function test_course_rate()
     {
         $randomCourse = Course::query()->inRandomOrder()->first();
+        $randomUser = User::query()->inRandomOrder()->first();
 
         $rating = new Rating();
         $rating->id = (string) Str::orderedUuid();
         $rating->value = 5;
         $rating->comment = 'Awesome: ' . fake()->text(30);
+        $rating->user_id = $randomUser->id;
 
         $response = $this->put("/api/course/{$randomCourse->id}/rate", $rating->toArray());
 

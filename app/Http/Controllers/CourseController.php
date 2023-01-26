@@ -6,6 +6,7 @@ use App\Http\Requests\FilterRequest;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use App\Http\Requests\StoreRatingRequest;
+use App\Models\Area;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Response;
@@ -68,6 +69,8 @@ class CourseController extends Controller
     public function filter(FilterRequest $request): Response
     {
         $criterias = $request->validated();
+
+        Area::query()->findOrFail($request->area_id);
 
         $filtered = Course::query()
             ->where('area_id', '=', $criterias['areaId'])
