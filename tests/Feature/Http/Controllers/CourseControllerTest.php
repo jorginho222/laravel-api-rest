@@ -74,14 +74,14 @@ class CourseControllerTest extends TestCase
 
     public function test_course_filter()
     {
-        $randomArea = Area::query()->inRandomOrder()->first();
+        $randomAreaId = Course::query()->inRandomOrder()->first()->area_id;
 
         $minPrice = Course::query()->orderBy('price')->first()->price;
 
         $maxPrice = Course::query()->orderBy('price', 'desc')->first()->price;
 
         $criterias = [
-          'areaId' => $randomArea->id,
+          'areaId' => $randomAreaId,
           'minPrice' => $minPrice,
           'maxPrice' => $maxPrice,
         ];
@@ -98,12 +98,17 @@ class CourseControllerTest extends TestCase
 
     public function test_course_enroll()
     {
+        $randomUserId = User::query()->inRandomOrder()->first()->id;
+        $enrollmentData = [
+            'userId' => $randomUserId,
+        ];
+
         $randomCourse = Course::query()->inRandomOrder()->first();
         $randomCourse->available_places = 1;
         $randomCourse->is_full = false;
         $randomCourse->save();
 
-        $response = $this->put("/api/course/{$randomCourse->id}/enroll");
+        $response = $this->put("/api/course/{$randomCourse->id}/enroll", $enrollmentData);
 
         $updatedCourse = $response->original;
 

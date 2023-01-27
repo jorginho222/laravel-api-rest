@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EnrollCourseRequest;
 use App\Http\Requests\FilterRequest;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
@@ -10,6 +11,7 @@ use App\Models\Area;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Response;
+use function PHPUnit\Framework\isEmpty;
 
 class CourseController extends Controller
 {
@@ -70,7 +72,7 @@ class CourseController extends Controller
     {
         $criterias = $request->validated();
 
-        Area::query()->findOrFail($request->area_id);
+        Area::query()->findOrFail($criterias['areaId']);
 
         $filtered = Course::query()
             ->where('area_id', '=', $criterias['areaId'])
@@ -84,8 +86,20 @@ class CourseController extends Controller
     /**
      *  Effectuates an enrollment
      */
-    public function enroll(Course $course): Response
+    public function enroll(Course $course, EnrollCourseRequest $request): Response
     {
+        $enrollment = $request->validated();
+
+        $user = User::query()->findOrFail($enrollment['userId']);
+
+        if (!isEmpty($user->courses)) {
+            foreach ($user->courses as $userCourse) {
+                if ($userCourse->id === $course->id) {
+                    abort(400, sprintf('El usuario ya se encuentra inscripto en este curso'));
+                }
+            }
+        }
+
         if ($course->is_full) {
             abort(400, sprintf('No hay cupo disponible para el curso: %s', $course->name));
         }
@@ -96,9 +110,9 @@ class CourseController extends Controller
             $course->is_full = true;
         }
 
-        $course->save();
+        $user->courses()->save($course);
 
-        return \response($course, 200);
+        return \response($user->courses, 200);
     }
 
     /**

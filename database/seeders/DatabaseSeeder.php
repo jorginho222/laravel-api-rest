@@ -3,6 +3,9 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Area;
+use App\Models\Course;
+use App\Models\Rating;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -15,8 +18,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-         User::factory(10)->create();
+        $users = User::factory(10)->create();
 
-        // TODO: Factories and seeders for rest of resources
+        $areas = Area::factory(5)->create();
+
+        $courses = Course::factory(15)
+            ->make()
+            ->each(function ($course) use ($areas) {
+                $randArea = $areas->random();
+                $course->area_id = $randArea->id;
+                $course->save();
+            });
+
+        $ratings = Rating::factory(60)
+            ->make()
+            ->each(function ($rating) use ($users, $courses) {
+               $rating->course_id = $courses->random()->id;
+               $rating->user_id = $users->random()->id;
+               $rating->save();
+            });
     }
 }

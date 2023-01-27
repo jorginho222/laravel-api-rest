@@ -29,4 +29,9 @@ class Course extends Model
     {
         return $this->hasMany(Rating::class, 'course_id');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'course_user');
+    }
 }
