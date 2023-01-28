@@ -118,11 +118,16 @@ class CourseControllerTest extends TestCase
 
     public function test_fully_course_enroll()
     {
+        $randomUserId = User::query()->inRandomOrder()->first()->id;
+        $enrollmentData = [
+            'userId' => $randomUserId,
+        ];
+
         $randomCourse = Course::query()->inRandomOrder()->first();
         $randomCourse->is_full = true;
         $randomCourse->save();
 
-        $response = $this->put("/api/course/{$randomCourse->id}/enroll");
+        $response = $this->put("/api/course/{$randomCourse->id}/enroll", $enrollmentData);
 
         $this->assertEquals(400, $response->getStatusCode());
     }

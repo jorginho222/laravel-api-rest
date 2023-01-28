@@ -92,7 +92,7 @@ class CourseController extends Controller
 
         $user = User::query()->findOrFail($enrollment['userId']);
 
-        if (!isEmpty($user->courses)) {
+        if ($user->courses) {
             foreach ($user->courses as $userCourse) {
                 if ($userCourse->id === $course->id) {
                     abort(400, sprintf('El usuario ya se encuentra inscripto en este curso'));
@@ -112,7 +112,7 @@ class CourseController extends Controller
 
         $user->courses()->save($course);
 
-        return \response($user->courses, 200);
+        return \response($course, 200);
     }
 
     /**

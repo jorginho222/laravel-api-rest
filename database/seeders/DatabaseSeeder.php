@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\Rating;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,7 +19,48 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $users = User::factory(10)->create();
+        $users = User::factory(10)
+            ->create()
+            ->each(function ($user) {
+                $student = Bouncer::role()->firstOrCreate([
+                   'name' => 'student',
+                   'title' => 'Student',
+                ]);
+
+                $enroll = Bouncer::ability()->firstOrCreate([
+                    'name' => 'enroll',
+                    'title' => 'Sign up in a course',
+                ]);
+
+                $rate = Bouncer::ability()->firstOrCreate([
+                   'name' => 'rate',
+                   'title' => 'Rate a course'
+                ]);
+
+                Bouncer::allow($student)->to($enroll);
+
+                Bouncer::allow($student)->to($rate);
+
+                $user->assign('student');
+            });
+
+        $instructors = User::factory(10)
+            ->create()
+            ->each(function ($user) {
+                $instructor = Bouncer::role()->firstOrCreate([
+                    'name' => 'instructor',
+                    'title' => 'Instructor',
+                ]);
+
+                $manageCourses = Bouncer::ability()->firstOrCreate([
+                    'name' => 'manage-courses',
+                    'title' => 'Manage own courses',
+                ]);
+
+                Bouncer::allow($instructor)->to($manageCourses);
+
+                $user->assign('instructor');
+            });
 
         $areas = Area::factory(5)->create();
 
