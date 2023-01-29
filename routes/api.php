@@ -26,6 +26,7 @@ Route::apiResource('area', AreaController::class);
 Route::apiResource('course', CourseController::class);
 
 //Route::apiResource('rating', RatingController::class);
+//Route::apiResource('enrollment', EnrollmentController::class);
 
 Route::post('course/filter', [CourseController::class, 'filter']);
 

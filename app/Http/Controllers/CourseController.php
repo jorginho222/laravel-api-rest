@@ -11,7 +11,7 @@ use App\Models\Area;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Response;
-use function PHPUnit\Framework\isEmpty;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class CourseController extends Controller
 {
@@ -31,7 +31,16 @@ class CourseController extends Controller
     public function store(StoreCourseRequest $request): Response
     {
         $request->validated();
-        $course = Course::query()->firstOrCreate($request->all());
+
+        $area = Area::query()->findOrFail($request['area_id']);
+
+        $user = User::query()->findOrFail($request['user_id']);
+
+        if (Bouncer::is($user)->notAn('instructor')) {
+            abort(403, 'EL usuario no esta autorizado a crear un curso');
+        }
+
+        $course = $user->courses()->firstOrCreate($request->all());
 
         $course->available_places = $course->max_students;
 

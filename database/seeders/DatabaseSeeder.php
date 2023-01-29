@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $users = User::factory(10)
+        $users = User::factory(20)
             ->create()
             ->each(function ($user) {
                 $student = Bouncer::role()->firstOrCreate([
@@ -62,13 +62,33 @@ class DatabaseSeeder extends Seeder
                 $user->assign('instructor');
             });
 
+        $admins = User::factory(3)
+            ->create()
+            ->each(function ($user) {
+                $admin = Bouncer::role()->firstOrCreate([
+                    'name' => 'administrator',
+                    'title' => 'Administrator',
+                ]);
+
+                $manageAreas = Bouncer::ability()->firstOrCreate([
+                    'name' => 'manage-areas',
+                    'title' => 'Manage the areas',
+                ]);
+
+                Bouncer::allow($admin)->to($manageAreas);
+
+                $user->assign('administrator');
+            });
+
         $areas = Area::factory(5)->create();
 
-        $courses = Course::factory(15)
+        $courses = Course::factory(10)
             ->make()
-            ->each(function ($course) use ($areas) {
+            ->each(function ($course) use ($areas, $instructors) {
                 $randArea = $areas->random();
+                $randInstruc = $instructors->random();
                 $course->area_id = $randArea->id;
+                $course->user_id = $randInstruc->id;
                 $course->save();
             });
 

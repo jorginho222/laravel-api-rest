@@ -23,10 +23,12 @@ return new class extends Migration
             $table->float('price',7,2)->comment("Course price");
             $table->float('rating')->default(0)->comment("Course average rating");
             $table->uuid('area_id');
+            $table->uuid('user_id');
             $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('area_id')->references('id')->on('areas');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
