@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DeleteCourseRequest;
 use App\Http\Requests\EnrollCourseRequest;
 use App\Http\Requests\FilterRequest;
 use App\Http\Requests\StoreCourseRequest;
@@ -62,14 +63,34 @@ class CourseController extends Controller
      */
     public function update(UpdateCourseRequest $request, Course $course): Response
     {
-        return $course->update($request->all()) ? \response($course) : \response(null, 400);
+        $request->validated();
+
+        $area = Area::query()->findOrFail($request['area_id']);
+
+        $user = User::query()->findOrFail($request['user_id']);
+
+        if ($user->id !== $course->user_id) {
+            abort(403, 'El usuario no esta autorizado a editar el curso');
+        }
+
+        $course->update($request->all());
+
+        return \response($course, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Course $course): Response
+    public function destroy(Course $course, DeleteCourseRequest $request): Response
     {
+        $request->validated();
+
+        $user = User::query()->findOrFail($request['user_id']);
+
+        if ($user->id !== $course->user_id) {
+            abort(403, 'El usuario no esta autorizado a eliminar el curso');
+        }
+
         $course->delete();
         return \response(null, 204);
     }
@@ -90,38 +111,6 @@ class CourseController extends Controller
             ->orderBy('price')->get();
 
         return \response($filtered, 200);
-    }
-
-    /**
-     *  Effectuates an enrollment
-     */
-    public function enroll(Course $course, EnrollCourseRequest $request): Response
-    {
-        $enrollment = $request->validated();
-
-        $user = User::query()->findOrFail($enrollment['userId']);
-
-        if ($user->courses) {
-            foreach ($user->courses as $userCourse) {
-                if ($userCourse->id === $course->id) {
-                    abort(400, sprintf('El usuario ya se encuentra inscripto en este curso'));
-                }
-            }
-        }
-
-        if ($course->is_full) {
-            abort(400, sprintf('No hay cupo disponible para el curso: %s', $course->name));
-        }
-
-        $course->available_places --;
-
-        if ($course->available_places === 0) {
-            $course->is_full = true;
-        }
-
-        $user->courses()->save($course);
-
-        return \response($course, 200);
     }
 
     /**

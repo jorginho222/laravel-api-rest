@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EnrollCourseRequest;
+use App\Models\Course;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class EnrollmentController extends Controller
 {
@@ -17,14 +22,44 @@ class EnrollmentController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     *  Effectuates an enrollment
      */
-    public function store(Request $request)
+    public function enrollCourse(EnrollCourseRequest $request): Response
     {
-        //
+        $enrollment = $request->validated();
+
+        $user = User::query()->findOr($enrollment['user_id'], function () {
+            abort(400, 'No se encuentra el usuario');
+        });
+        $course = Course::query()->findOrFail($enrollment['course_id']);
+
+        if (Bouncer::is($user)->notA('student')) {
+            abort(400, 'Solo usuarios registrados como estudiantes pueden inscribirse');
+        }
+
+        if ($user->enrollments) {
+            foreach ($user->enrollments as $enrollment) {
+                if ($enrollment->course_id === $course->id) {
+                    abort(400, 'El usuario ya se encuentra inscripto en este curso');
+                }
+            }
+        }
+
+        if ($course->is_full) {
+            abort(400, sprintf('No hay cupo disponible para el curso: %s', $course->name));
+        }
+
+        $user->enrollments()->firstOrCreate($request->all());
+
+        $course->available_places --;
+
+        if ($course->available_places === 0) {
+            $course->is_full = true;
+        }
+
+        $course->save();
+
+        return \response($course, 200);
     }
 
     /**

@@ -26,6 +26,11 @@ class Course extends Model
         return $this->belongsTo(Area::class, 'area_id');
     }
 
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class, 'course_id');
+    }
+
     public function ratings()
     {
         return $this->hasMany(Rating::class, 'course_id');
