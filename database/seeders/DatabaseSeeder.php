@@ -80,7 +80,13 @@ class DatabaseSeeder extends Seeder
                 $user->assign('administrator');
             });
 
-        $areas = Area::factory(5)->create();
+        $areas = Area::factory(5)
+            ->make()
+            ->each(function ($area) use ($admins) {
+               $randAdmin = $admins->random();
+               $area->user_id = $randAdmin->id;
+               $area->save();
+            });
 
         $courses = Course::factory(10)
             ->make()

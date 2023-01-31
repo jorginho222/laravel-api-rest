@@ -14,6 +14,7 @@ class Area extends Model
     protected $fillable = [
         'id',
         'description',
+        'user_id',
     ];
 
     public function courses()

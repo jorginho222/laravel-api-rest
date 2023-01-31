@@ -11,11 +11,6 @@ use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class EnrollmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         //
@@ -24,17 +19,19 @@ class EnrollmentController extends Controller
     /**
      *  Effectuates an enrollment
      */
-    public function enrollCourse(EnrollCourseRequest $request): Response
+    public function enroll(EnrollCourseRequest $request): Response
     {
         $enrollment = $request->validated();
 
         $user = User::query()->findOr($enrollment['user_id'], function () {
             abort(400, 'No se encuentra el usuario');
         });
-        $course = Course::query()->findOrFail($enrollment['course_id']);
+        $course = Course::query()->findOr($enrollment['course_id'], function () {
+            abort(400, 'No se encuentra el curso');
+        });
 
         if (Bouncer::is($user)->notA('student')) {
-            abort(400, 'Solo usuarios registrados como estudiantes pueden inscribirse');
+            abort(403, 'Solo usuarios registrados como estudiantes pueden inscribirse');
         }
 
         if ($user->enrollments) {
@@ -62,35 +59,16 @@ class EnrollmentController extends Controller
         return \response($course, 200);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //

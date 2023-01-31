@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DeleteCourseRequest;
-use App\Http\Requests\EnrollCourseRequest;
 use App\Http\Requests\FilterRequest;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
-use App\Http\Requests\StoreRatingRequest;
 use App\Models\Area;
 use App\Models\Course;
 use App\Models\User;
@@ -21,7 +19,7 @@ class CourseController extends Controller
      */
     public function index(): Response
     {
-        $orderedByRating = Course::query()->with('ratings')->orderBy('rating', 'desc')->get();
+        $orderedByRating = Course::query()->orderBy('rating', 'desc')->get();
 
         return response($orderedByRating->groupBy('area_id'), 200);
     }
@@ -53,9 +51,9 @@ class CourseController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Course $course): Course
+    public function show(Course $course): Response
     {
-        return $course;
+        return \response($course->load(['area', 'ratings', 'user']), 200);
     }
 
     /**
@@ -111,36 +109,5 @@ class CourseController extends Controller
             ->orderBy('price')->get();
 
         return \response($filtered, 200);
-    }
-
-    /**
-     *  Rates a specified course
-     */
-    public function rate(Course $course, StoreRatingRequest $request): Response
-    {
-        $request->validated();
-
-        User::query()->findOrFail($request->user_id);
-
-        $course->ratings()->firstOrCreate($request->all());
-
-        $count = $course->ratings->count();
-        $sum = $course->ratings->pluck('value')->sum();
-
-        $course->rating = $sum / $count;
-
-        $course->save();
-
-        return \response($course, 200);
-    }
-
-    /**
-     *  Get ratings for a specified course
-     */
-    public function getRatings(Course $course): Response
-    {
-        $ratings = $course->ratings;
-
-        return \response($ratings, 200);
     }
 }

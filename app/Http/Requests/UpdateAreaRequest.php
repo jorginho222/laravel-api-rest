@@ -25,6 +25,7 @@ class UpdateAreaRequest extends FormRequest
     {
         return [
             'description' => 'required|max:60',
+            'user_id' => 'required|string|min:32|max:36',
         ];
     }
 }

@@ -26,12 +26,10 @@ Route::apiResource('area', AreaController::class);
 
 Route::apiResource('course', CourseController::class);
 
-//Route::apiResource('rating', RatingController::class);
-//Route::apiResource('enrollment', EnrollmentController::class);
-
 Route::post('course/filter', [CourseController::class, 'filter']);
 
-Route::put('enrollment', [EnrollmentController::class, 'enrollCourse']);
+Route::put('enrollment', [EnrollmentController::class, 'enroll']);
 
-Route::put('course/{course}/rate', [CourseController::class, 'rate']);
-Route::get('course/{course}/ratings', [CourseController::class, 'getRatings']);
+Route::post('rating', [RatingController::class, 'rate']);
+
+Route::get('course/{course}/ratings', [RatingController::class, 'getCourseRatings']);
