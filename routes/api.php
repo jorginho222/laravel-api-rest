@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\RatingController;
@@ -22,14 +23,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('area', AreaController::class);
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::apiResource('area', AreaController::class);
 
-Route::apiResource('course', CourseController::class);
+    Route::apiResource('course', CourseController::class);
 
-Route::post('course/filter', [CourseController::class, 'filter']);
+    Route::post('course/filter', [CourseController::class, 'filter']);
 
-Route::put('enrollment', [EnrollmentController::class, 'enroll']);
+    Route::put('enrollment', [EnrollmentController::class, 'enroll']);
 
-Route::post('rating', [RatingController::class, 'rate']);
+    Route::post('rating', [RatingController::class, 'rate']);
+});
 
-Route::get('course/{course}/ratings', [RatingController::class, 'getCourseRatings']);
+Route::post('login', [AuthController::class, 'login']);

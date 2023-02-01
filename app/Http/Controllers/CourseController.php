@@ -53,7 +53,7 @@ class CourseController extends Controller
      */
     public function show(Course $course): Response
     {
-        return \response($course->load(['area', 'ratings', 'user']), 200);
+        return \response($course->load(['ratings', 'user']), 200);
     }
 
     /**
