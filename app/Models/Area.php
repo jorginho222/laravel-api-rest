@@ -21,4 +21,9 @@ class Area extends Model
     {
         return $this->hasMany(Course::class, 'area_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

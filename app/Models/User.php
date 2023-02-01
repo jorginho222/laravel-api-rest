@@ -14,6 +14,10 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, HasUuids, Notifiable, HasRolesAndAbilities;
 
+    protected $with = [
+      'areas'
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -63,5 +67,10 @@ class User extends Authenticatable
     public function courses()
     {
         return $this->hasMany(Course::class, 'user_id');
+    }
+
+    public function areas()
+    {
+        return $this->hasMany(Area::class, 'user_id');
     }
 }

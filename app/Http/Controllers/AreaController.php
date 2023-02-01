@@ -7,6 +7,7 @@ use App\Http\Requests\StoreAreaRequest;
 use App\Http\Requests\UpdateAreaRequest;
 use App\Models\Area;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Silber\Bouncer\BouncerFacade as Bouncer;
@@ -30,7 +31,7 @@ class AreaController extends Controller
 
         $user = $this->checkUserRole();
 
-        $area = $user->areas()->firstOrCreate($request->all());
+        $area = $user->areas()->create($request->all());
 
         return \response($area, 201);
     }
@@ -46,24 +47,22 @@ class AreaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAreaRequest $request): Response
+    public function update(Area $area, UpdateAreaRequest $request): Response
     {
         $request->validated();
 
-        $user = $this->checkUserRole();
+        $this->checkUserRole();
 
-        $area = $user->areas()->update($request->all());
+        $area->update($request->all());
 
-        return \response($area, 201);
+        return \response($area, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Area $area, DeleteAreaRequest $request): Response
+    public function destroy(Area $area): Response
     {
-        $request->validated();
-
         $this->checkUserRole();
 
         $area->delete();
@@ -73,10 +72,10 @@ class AreaController extends Controller
 
     private function checkUserRole()
     {
-        $user = User::query()->find(request()->user()->id)->get();
+        $user = request()->user();
 
         if (Bouncer::is($user)->notAn('administrator')) {
-            abort(400, 'Solo los administradores pueden gestionar las áreas');
+            abort(403, 'Solo los administradores pueden gestionar las áreas');
         }
 
         return $user;
