@@ -29,7 +29,6 @@ class StoreCourseRequest extends FormRequest
             'max_students' => 'required|min:1',
             'price' => 'required|numeric|min:0|max:10000',
             'area_id' => 'required|string|min:32|max:36',
-            'user_id' => 'required|string|min:32|max:36',
         ];
     }
 }

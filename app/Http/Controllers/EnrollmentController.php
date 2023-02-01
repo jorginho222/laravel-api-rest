@@ -21,18 +21,13 @@ class EnrollmentController extends Controller
      */
     public function enroll(EnrollCourseRequest $request): Response
     {
-        $enrollment = $request->validated();
+        $request->validated();
 
-        $user = User::query()->findOr($enrollment['user_id'], function () {
-            abort(400, 'No se encuentra el usuario');
-        });
-        $course = Course::query()->findOr($enrollment['course_id'], function () {
+        $course = Course::query()->findOr($request['course_id'], function () {
             abort(400, 'No se encuentra el curso');
         });
 
-        if (Bouncer::is($user)->notA('student')) {
-            abort(403, 'Solo usuarios registrados como estudiantes pueden inscribirse');
-        }
+        $user = $this->checkStudentRole();
 
         if ($user->enrollments) {
             foreach ($user->enrollments as $enrollment) {
@@ -72,5 +67,16 @@ class EnrollmentController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function checkStudentRole()
+    {
+        $user = \request()->user();
+
+        if (Bouncer::is($user)->notA('student')) {
+            abort(403, 'Solo los usuarios registrados como estudiantes pueden inscribirse');
+        }
+
+        return $user;
     }
 }

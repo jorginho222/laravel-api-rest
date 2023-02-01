@@ -29,7 +29,7 @@ class AreaController extends Controller
     {
         $request->validated();
 
-        $user = $this->checkUserRole();
+        $user = $this->checkAdminRole();
 
         $area = $user->areas()->create($request->all());
 
@@ -51,7 +51,7 @@ class AreaController extends Controller
     {
         $request->validated();
 
-        $this->checkUserRole();
+        $this->checkAdminRole();
 
         $area->update($request->all());
 
@@ -63,14 +63,14 @@ class AreaController extends Controller
      */
     public function destroy(Area $area): Response
     {
-        $this->checkUserRole();
+        $this->checkAdminRole();
 
         $area->delete();
 
         return \response(null, 204);
     }
 
-    private function checkUserRole()
+    private function checkAdminRole()
     {
         $user = request()->user();
 

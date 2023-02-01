@@ -18,7 +18,6 @@ class Course extends Model
         'max_students',
         'price',
         'area_id',
-        'user_id',
     ];
 
     public function area()
@@ -26,11 +25,17 @@ class Course extends Model
         return $this->belongsTo(Area::class, 'area_id');
     }
 
+    /**
+     *  Enrollments effectuated by students
+     */
     public function enrollments()
     {
         return $this->hasMany(Enrollment::class, 'course_id');
     }
 
+    /**
+     *  Ratings effectuated by students
+     */
     public function ratings()
     {
         return $this->hasMany(Rating::class, 'course_id');

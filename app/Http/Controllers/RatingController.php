@@ -16,18 +16,13 @@ class RatingController extends Controller
      */
     public function rate(StoreRatingRequest $request): Response
     {
-        $rating = $request->validated();
+        $request->validated();
 
-        $user = User::query()->findOr($rating['user_id'], function () {
-            abort(400, 'No se encuentra el usuario');
-        });
-        $course = Course::query()->findOr($rating['course_id'], function () {
+        $course = Course::query()->findOr($request['course_id'], function () {
             abort(400, 'No se encuentra el curso');
         });
 
-        if (Bouncer::is($user)->notA('student')) {
-            abort(403, 'Solo usuarios registrados como estudiantes pueden valorar un curso');
-        }
+        $user = $this->checkStudentRole();
 
         foreach ($user->ratings as $userRating) {
             if ($userRating->course_id === $course->id) {
@@ -45,6 +40,17 @@ class RatingController extends Controller
         $course->save();
 
         return \response($rating, 200);
+    }
+
+    public function checkStudentRole()
+    {
+        $user = \request()->user();
+
+        if (Bouncer::is($user)->notA('student')) {
+            abort(403, 'Solo los usuarios registrados como estudiantes pueden inscribirse');
+        }
+
+        return $user;
     }
 
 }

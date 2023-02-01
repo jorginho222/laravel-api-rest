@@ -28,7 +28,6 @@ class UpdateCourseRequest extends FormRequest
             'description' => 'required|max:255',
             'price' => 'required|numeric|min:0|max:10000',
             'area_id' => 'required|string|min:32|max:36',
-            'user_id' => 'required|string|min:32|max:36',
         ];
     }
 }

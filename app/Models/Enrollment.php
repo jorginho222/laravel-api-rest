@@ -11,7 +11,6 @@ class Enrollment extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'user_id',
         'course_id',
     ];
 

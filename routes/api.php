@@ -24,15 +24,19 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::apiResource('area', AreaController::class);
+    Route::apiResource('area', AreaController::class)->except(['index', 'show']);
 
-    Route::apiResource('course', CourseController::class);
-
-    Route::post('course/filter', [CourseController::class, 'filter']);
+    Route::apiResource('course', CourseController::class)->except(['index', 'show']);
 
     Route::put('enrollment', [EnrollmentController::class, 'enroll']);
 
     Route::post('rating', [RatingController::class, 'rate']);
 });
+
+Route::apiResource('area', AreaController::class)->only(['index', 'show']);
+
+Route::apiResource('course', CourseController::class)->only(['index', 'show']);
+
+Route::post('course/filter', [CourseController::class, 'filter']);
 
 Route::post('login', [AuthController::class, 'login']);

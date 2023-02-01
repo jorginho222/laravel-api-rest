@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DeleteCourseRequest;
 use App\Http\Requests\FilterRequest;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use App\Models\Area;
 use App\Models\Course;
-use App\Models\User;
 use Illuminate\Http\Response;
 use Silber\Bouncer\BouncerFacade as Bouncer;
 
@@ -25,19 +23,33 @@ class CourseController extends Controller
     }
 
     /**
+     * Apply all the filters
+     */
+    public function filter(FilterRequest $request): Response
+    {
+        $request->validated();
+
+        $this->checkIfAreaExist($request['area_id']);
+
+        $filtered = Course::query()
+            ->where('area_id', '=', $request['area_id'])
+            ->where('price', '>=', $request['minPrice'])
+            ->where('price', '<=', $request['maxPrice'])
+            ->orderBy('price')->get();
+
+        return \response($filtered, 200);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreCourseRequest $request): Response
     {
         $request->validated();
 
-        $area = Area::query()->findOrFail($request['area_id']);
+        $user = $this->checkInstructorRole();
 
-        $user = User::query()->findOrFail($request['user_id']);
-
-        if (Bouncer::is($user)->notAn('instructor')) {
-            abort(403, 'EL usuario no esta autorizado a crear un curso');
-        }
+        $this->checkIfAreaExist($request['area_id']);
 
         $course = $user->courses()->firstOrCreate($request->all());
 
@@ -63,13 +75,13 @@ class CourseController extends Controller
     {
         $request->validated();
 
-        $area = Area::query()->findOrFail($request['area_id']);
-
-        $user = User::query()->findOrFail($request['user_id']);
+        $user = $this->checkInstructorRole();
 
         if ($user->id !== $course->user_id) {
-            abort(403, 'El usuario no esta autorizado a editar el curso');
+            abort(403, 'Solo los propietarios del curso pueden editarlo');
         }
+
+        $this->checkIfAreaExist($request['area_id']);
 
         $course->update($request->all());
 
@@ -79,35 +91,32 @@ class CourseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Course $course, DeleteCourseRequest $request): Response
+    public function destroy(Course $course): Response
     {
-        $request->validated();
-
-        $user = User::query()->findOrFail($request['user_id']);
+        $user = $this->checkInstructorRole();
 
         if ($user->id !== $course->user_id) {
-            abort(403, 'El usuario no esta autorizado a eliminar el curso');
+            abort(403, 'Solo los propietarios del curso pueden eliminarlo');
         }
 
         $course->delete();
+
         return \response(null, 204);
     }
 
-    /**
-     * Apply all the filters
-     */
-    public function filter(FilterRequest $request): Response
+    public function checkInstructorRole()
     {
-        $criterias = $request->validated();
+        $user = request()->user();
 
-        Area::query()->findOrFail($criterias['areaId']);
+        if (Bouncer::is($user)->notAn('instructor')) {
+            abort(403, 'Solo instructores pueden gestionar los cursos');
+        }
 
-        $filtered = Course::query()
-            ->where('area_id', '=', $criterias['areaId'])
-            ->where('price', '>=', $criterias['minPrice'])
-            ->where('price', '<=', $criterias['maxPrice'])
-            ->orderBy('price')->get();
+        return $user;
+    }
 
-        return \response($filtered, 200);
+    public function checkIfAreaExist($areaId)
+    {
+        Area::query()->findOrFail($areaId);
     }
 }

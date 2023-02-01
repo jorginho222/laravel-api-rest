@@ -26,7 +26,6 @@ class StoreRatingRequest extends FormRequest
         return [
             'value' => 'required|numeric|min:1|max:5',
             'comment' => 'nullable|max:500',
-            'user_id' => 'required|string|min:32|max:36',
             'course_id' => 'required|string|min:32|max:36',
         ];
     }

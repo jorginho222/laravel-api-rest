@@ -14,7 +14,6 @@ class Rating extends Model
         'id',
         'value',
         'comment',
-        'user_id',
         'course_id',
     ];
 
