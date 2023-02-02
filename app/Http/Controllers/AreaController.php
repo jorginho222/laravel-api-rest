@@ -29,7 +29,7 @@ class AreaController extends Controller
     {
         $request->validated();
 
-        $user = $this->checkAdminRole();
+        $user = request()->user();
 
         $area = $user->areas()->create($request->all());
 
@@ -51,8 +51,6 @@ class AreaController extends Controller
     {
         $request->validated();
 
-        $this->checkAdminRole();
-
         $area->update($request->all());
 
         return \response($area, 200);
@@ -61,23 +59,10 @@ class AreaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Area $area): Response
+    public function destroy(Area $area, DeleteAreaRequest $request): Response
     {
-        $this->checkAdminRole();
-
         $area->delete();
 
         return \response(null, 204);
-    }
-
-    private function checkAdminRole()
-    {
-        $user = request()->user();
-
-        if (Bouncer::is($user)->notAn('administrator')) {
-            abort(403, 'Solo los administradores pueden gestionar las áreas');
-        }
-
-        return $user;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DeleteCourseRequest;
 use App\Http\Requests\FilterRequest;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
@@ -47,9 +48,9 @@ class CourseController extends Controller
     {
         $request->validated();
 
-        $user = $this->checkInstructorRole();
-
         $this->checkIfAreaExist($request['area_id']);
+
+        $user = request()->user();
 
         $course = $user->courses()->firstOrCreate($request->all());
 
@@ -75,7 +76,7 @@ class CourseController extends Controller
     {
         $request->validated();
 
-        $user = $this->checkInstructorRole();
+        $user = request()->user();
 
         if ($user->id !== $course->user_id) {
             abort(403, 'Solo los propietarios del curso pueden editarlo');
@@ -91,9 +92,9 @@ class CourseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Course $course): Response
+    public function destroy(Course $course, DeleteCourseRequest $request): Response
     {
-        $user = $this->checkInstructorRole();
+        $user = request()->user();
 
         if ($user->id !== $course->user_id) {
             abort(403, 'Solo los propietarios del curso pueden eliminarlo');
@@ -102,17 +103,6 @@ class CourseController extends Controller
         $course->delete();
 
         return \response(null, 204);
-    }
-
-    public function checkInstructorRole()
-    {
-        $user = request()->user();
-
-        if (Bouncer::is($user)->notAn('instructor')) {
-            abort(403, 'Solo instructores pueden gestionar los cursos');
-        }
-
-        return $user;
     }
 
     public function checkIfAreaExist($areaId)

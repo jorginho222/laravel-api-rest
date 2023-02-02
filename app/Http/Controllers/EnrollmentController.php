@@ -27,7 +27,7 @@ class EnrollmentController extends Controller
             abort(400, 'No se encuentra el curso');
         });
 
-        $user = $this->checkStudentRole();
+        $user = \request()->user();
 
         if ($user->enrollments) {
             foreach ($user->enrollments as $enrollment) {
@@ -67,16 +67,5 @@ class EnrollmentController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function checkStudentRole()
-    {
-        $user = \request()->user();
-
-        if (Bouncer::is($user)->notA('student')) {
-            abort(403, 'Solo los usuarios registrados como estudiantes pueden inscribirse');
-        }
-
-        return $user;
     }
 }

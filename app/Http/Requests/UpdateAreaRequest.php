@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class UpdateAreaRequest extends FormRequest
 {
@@ -13,6 +14,10 @@ class UpdateAreaRequest extends FormRequest
      */
     public function authorize()
     {
+        if (Bouncer::is($this->user())->notAn('administrator')) {
+            abort(403, 'Solo los administradores pueden gestionar las áreas');
+        }
+
         return true;
     }
 
