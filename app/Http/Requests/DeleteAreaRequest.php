@@ -15,7 +15,7 @@ class DeleteAreaRequest extends FormRequest
     public function authorize()
     {
         if (Bouncer::is($this->user())->notAn('administrator')) {
-            abort(403, 'Solo los administradores pueden gestionar las áreas');
+            abort(403, 'Only admins can manage the areas');
         }
 
         return true;

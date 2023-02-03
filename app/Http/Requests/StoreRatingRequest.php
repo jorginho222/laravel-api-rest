@@ -15,7 +15,7 @@ class StoreRatingRequest extends FormRequest
     public function authorize()
     {
         if (Bouncer::is($this->user())->notA('student')) {
-            abort(403, 'Solo los usuarios registrados como estudiantes pueden valorar cursos');
+            abort(403, 'Only users registered as students can rate a course');
         }
 
         return true;

@@ -15,7 +15,7 @@ class StoreCourseRequest extends FormRequest
     public function authorize()
     {
         if (Bouncer::is($this->user())->notAn('instructor')) {
-            abort(403, 'Solo instructores pueden gestionar los cursos');
+            abort(403, 'Only instructors can manage the courses');
         }
 
         return true;

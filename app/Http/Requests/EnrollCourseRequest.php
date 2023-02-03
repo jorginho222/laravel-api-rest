@@ -15,7 +15,7 @@ class EnrollCourseRequest extends FormRequest
     public function authorize()
     {
         if (Bouncer::is($this->user())->notA('student')) {
-            abort(403, 'Solo los usuarios registrados como estudiantes pueden inscribirse');
+            abort(403, 'Only users registered as students can enroll in a course');
         }
 
         return true;

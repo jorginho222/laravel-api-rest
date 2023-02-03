@@ -6,10 +6,11 @@ use App\Http\Requests\DeleteCourseRequest;
 use App\Http\Requests\FilterRequest;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
+use App\Http\Resources\CourseCollection;
+use App\Http\Resources\CourseResource;
 use App\Models\Area;
 use App\Models\Course;
 use Illuminate\Http\Response;
-use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class CourseController extends Controller
 {
@@ -20,7 +21,7 @@ class CourseController extends Controller
     {
         $orderedByRating = Course::query()->orderBy('rating', 'desc')->get();
 
-        return response($orderedByRating->groupBy('area_id'), 200);
+        return response(new CourseCollection($orderedByRating->groupBy('area_id')), 200);
     }
 
     /**
@@ -38,7 +39,7 @@ class CourseController extends Controller
             ->where('price', '<=', $request['maxPrice'])
             ->orderBy('price')->get();
 
-        return \response($filtered, 200);
+        return \response(new CourseCollection($filtered), 200);
     }
 
     /**
@@ -58,7 +59,7 @@ class CourseController extends Controller
 
         $course->save();
 
-        return response($course, 201);
+        return response(new CourseResource($course), 201);
     }
 
     /**
@@ -66,7 +67,7 @@ class CourseController extends Controller
      */
     public function show(Course $course): Response
     {
-        return \response($course->load(['ratings', 'user']), 200);
+        return \response(new CourseResource($course->load(['ratings', 'user'])), 200);
     }
 
     /**
@@ -79,14 +80,14 @@ class CourseController extends Controller
         $user = request()->user();
 
         if ($user->id !== $course->user_id) {
-            abort(403, 'Solo los propietarios del curso pueden editarlo');
+            abort(403, 'Only course owners can edit');
         }
 
         $this->checkIfAreaExist($request['area_id']);
 
         $course->update($request->all());
 
-        return \response($course, 200);
+        return response(new CourseResource($course), 200);
     }
 
     /**
@@ -97,7 +98,7 @@ class CourseController extends Controller
         $user = request()->user();
 
         if ($user->id !== $course->user_id) {
-            abort(403, 'Solo los propietarios del curso pueden eliminarlo');
+            abort(403, 'Only course owners can delete');
         }
 
         $course->delete();
