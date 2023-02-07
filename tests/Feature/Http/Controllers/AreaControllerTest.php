@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Area;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
@@ -19,15 +20,36 @@ class AreaControllerTest extends TestCase
 
     public function test_area_store()
     {
+        $user = User::query()->whereHas('roles', function ($role) {
+            $role->where('name', '=', 'administrator');
+        })->first();
+
         $area = new Area();
         $area->id = (string) Str::orderedUuid();
         $area->description = fake('pt_ES')->text(60);
 
-        $response = $this->post('/api/area', $area->toArray());
+        $response = $this->actingAs($user)
+                         ->post('/api/area', $area->toArray());
         $createdArea = $response->original;
 
         $response->assertStatus(201);
         $this->assertEquals($area->id, $createdArea->id);
+    }
+
+    public function test_area_store_unauthorized()
+    {
+        $user = User::query()->whereHas('roles', function ($role) {
+            $role->where('name', '=', 'instructor');
+        })->first();
+
+        $area = new Area();
+        $area->id = (string) Str::orderedUuid();
+        $area->description = fake('pt_ES')->text(60);
+
+        $response = $this->actingAs($user)
+                         ->post('/api/area', $area->toArray());
+
+        $response->assertStatus(403);
     }
 
     public function test_area_show()
@@ -41,11 +63,16 @@ class AreaControllerTest extends TestCase
 
     public function test_area_update()
     {
+        $user = User::query()->whereHas('roles', function ($role) {
+            $role->where('name', '=', 'administrator');
+        })->first();
+
         $randomArea = Area::query()->inRandomOrder()->first();
 
         $randomArea->description = fake('pt_ES')->text(60);
 
-        $response = $this->put("/api/area/{$randomArea->id}", $randomArea->toArray());
+        $response = $this->actingAs($user)
+                         ->put("/api/area/{$randomArea->id}", $randomArea->toArray());
 
         $updatedArea = $response->original;
 
@@ -53,12 +80,47 @@ class AreaControllerTest extends TestCase
         $this->assertEquals($randomArea->description, $updatedArea->description);
     }
 
-    public function test_area_destroy()
+    public function test_area_update_unauthorized()
     {
+        $user = User::query()->whereHas('roles', function ($role) {
+            $role->where('name', '=', 'student');
+        })->first();
+
         $randomArea = Area::query()->inRandomOrder()->first();
 
-        $response = $this->delete("/api/area/{$randomArea->id}");
+        $randomArea->description = fake('pt_ES')->text(60);
+
+        $response = $this->actingAs($user)
+                         ->put("/api/area/{$randomArea->id}", $randomArea->toArray());
+
+        $response->assertStatus(403);
+    }
+
+    public function test_area_destroy()
+    {
+        $user = User::query()->whereHas('roles', function ($role) {
+            $role->where('name', '=', 'administrator');
+        })->first();
+
+        $randomArea = Area::query()->inRandomOrder()->first();
+
+        $response = $this->actingAs($user)
+                         ->delete("/api/area/{$randomArea->id}");
 
         $response->assertStatus(204);
+    }
+
+    public function test_area_destroy_unauthorized()
+    {
+        $user = User::query()->whereHas('roles', function ($role) {
+            $role->where('name', '=', 'instructor');
+        })->first();
+
+        $randomArea = Area::query()->inRandomOrder()->first();
+
+        $response = $this->actingAs($user)
+                         ->delete("/api/area/{$randomArea->id}");
+
+        $response->assertStatus(403);
     }
 }

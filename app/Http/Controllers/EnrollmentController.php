@@ -25,7 +25,7 @@ class EnrollmentController extends Controller
         $request->validated();
 
         $course = Course::query()->findOr($request['course_id'], function () {
-            abort(400, 'Course not found');
+            abort(404, 'Course not found');
         });
 
         $user = \request()->user();
