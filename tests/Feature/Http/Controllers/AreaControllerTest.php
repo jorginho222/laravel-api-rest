@@ -28,8 +28,8 @@ class AreaControllerTest extends TestCase
         $area->id = (string) Str::orderedUuid();
         $area->description = fake('pt_ES')->text(60);
 
-        $response = $this->actingAs($user)
-                         ->post('/api/area', $area->toArray());
+        $response = $this->actingAs($user)->post('/api/area', $area->toArray());
+
         $createdArea = $response->original;
 
         $response->assertStatus(201);
@@ -46,8 +46,7 @@ class AreaControllerTest extends TestCase
         $area->id = (string) Str::orderedUuid();
         $area->description = fake('pt_ES')->text(60);
 
-        $response = $this->actingAs($user)
-                         ->post('/api/area', $area->toArray());
+        $response = $this->actingAs($user)->post('/api/area', $area->toArray());
 
         $response->assertStatus(403);
     }
@@ -71,8 +70,7 @@ class AreaControllerTest extends TestCase
 
         $randomArea->description = fake('pt_ES')->text(60);
 
-        $response = $this->actingAs($user)
-                         ->put("/api/area/{$randomArea->id}", $randomArea->toArray());
+        $response = $this->actingAs($user)->put("/api/area/{$randomArea->id}", $randomArea->toArray());
 
         $updatedArea = $response->original;
 
@@ -90,8 +88,7 @@ class AreaControllerTest extends TestCase
 
         $randomArea->description = fake('pt_ES')->text(60);
 
-        $response = $this->actingAs($user)
-                         ->put("/api/area/{$randomArea->id}", $randomArea->toArray());
+        $response = $this->actingAs($user)->put("/api/area/{$randomArea->id}", $randomArea->toArray());
 
         $response->assertStatus(403);
     }
@@ -104,8 +101,7 @@ class AreaControllerTest extends TestCase
 
         $randomArea = Area::query()->inRandomOrder()->first();
 
-        $response = $this->actingAs($user)
-                         ->delete("/api/area/{$randomArea->id}");
+        $response = $this->actingAs($user)->delete("/api/area/{$randomArea->id}");
 
         $response->assertStatus(204);
     }
@@ -118,8 +114,7 @@ class AreaControllerTest extends TestCase
 
         $randomArea = Area::query()->inRandomOrder()->first();
 
-        $response = $this->actingAs($user)
-                         ->delete("/api/area/{$randomArea->id}");
+        $response = $this->actingAs($user)->delete("/api/area/{$randomArea->id}");
 
         $response->assertStatus(403);
     }

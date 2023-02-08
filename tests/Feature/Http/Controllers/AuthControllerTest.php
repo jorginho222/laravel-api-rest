@@ -13,10 +13,17 @@ class AuthControllerTest extends TestCase
     // TODO: finish test_login assertions
     public function test_login()
     {
-        $userFact = User::factory(1)->create()->first();
+        $user = User::query()->whereHas('roles', function ($role) {
+            $role->where('name', '=', 'student');
+        })->first();
 
-        $userArr = $userFact->toArray();
+        $credentials = [
+            'email' => $user->email,
+            'password' => 'password',
+        ];
 
-        $response = $this->post('/api/login', $userArr);
+        $response = $this->post('/api/login', $credentials);
+
+        $response->assertJsonStructure(['access_token']);
     }
 }
