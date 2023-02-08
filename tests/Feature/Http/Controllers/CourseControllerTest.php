@@ -18,6 +18,29 @@ class CourseControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_course_filter()
+    {
+        $randomAreaId = Course::query()->inRandomOrder()->first()->area_id;
+
+        $minPrice = Course::query()->orderBy('price')->first()->price;
+
+        $maxPrice = Course::query()->orderBy('price', 'desc')->first()->price;
+
+        $criterias = [
+            'area_id' => $randomAreaId,
+            'minPrice' => $minPrice,
+            'maxPrice' => $maxPrice,
+        ];
+
+        $response = $this->post('/api/course/filter', $criterias);
+
+        $filtered = $response->original;
+
+        $response->assertStatus(200);
+
+        $this->assertNotEmpty($filtered);
+    }
+
     public function test_course_store()
     {
         $user = User::query()->whereHas('roles', function ($role) {
@@ -122,26 +145,25 @@ class CourseControllerTest extends TestCase
         $response->assertStatus(204);
     }
 
-    public function test_course_filter()
+    public function test_course_no_owner_destroy()
     {
-        $randomAreaId = Course::query()->inRandomOrder()->first()->area_id;
+        $owner = User::query()->whereHas('roles', function ($role) {
+            $role->where('name', '=', 'instructor');
+        })->orderBy('created_at', 'desc')->first();
 
-        $minPrice = Course::query()->orderBy('price')->first()->price;
+        $noOwner = User::query()->whereHas('roles', function ($role) {
+            $role->where('name', '=', 'instructor');
+        })->inRandomOrder()->orderBy('created_at')->first();
 
-        $maxPrice = Course::query()->orderBy('price', 'desc')->first()->price;
+        $course = Course::query()->inRandomOrder()->first();
 
-        $criterias = [
-          'area_id' => $randomAreaId,
-          'minPrice' => $minPrice,
-          'maxPrice' => $maxPrice,
-        ];
+        $course->user_id = $owner->id;
 
-        $response = $this->post('/api/course/filter', $criterias);
+        $course->save();
 
-        $filtered = $response->original;
+        $response = $this->actingAs($noOwner)->delete("/api/course/{$course->id}");
 
-        $response->assertStatus(200);
-
-        $this->assertNotEmpty($filtered);
+        $response->assertStatus(403);
     }
+
 }
