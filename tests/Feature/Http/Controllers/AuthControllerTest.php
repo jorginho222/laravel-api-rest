@@ -10,15 +10,13 @@ use Tests\TestCase;
 class AuthControllerTest extends TestCase
 {
 
+    // TODO: finish test_login assertions
     public function test_login()
     {
-        $user = new User();
-        $user->name = 'Ramone';
-        $user->email = 'test@test.com';
-        $user->password = '12345678';
+        $userFact = User::factory(1)->create()->first();
 
-        $registered = User::query()->firstOrCreate($user->toArray());
+        $userArr = $userFact->toArray();
 
-        $response = $this->post('/api/login', $user->toArray());
+        $response = $this->post('/api/login', $userArr);
     }
 }
