@@ -21,7 +21,7 @@ class CourseController extends Controller
     {
         $orderedByRating = Course::query()->orderBy('rating', 'desc')->get();
 
-        return response(new CourseCollection($orderedByRating->groupBy('area_id')), 200);
+        return response(new CourseCollection($orderedByRating), 200);
     }
 
     /**
@@ -34,9 +34,11 @@ class CourseController extends Controller
         $this->checkIfAreaExist($request['area_id']);
 
         $filtered = Course::query()
-            ->where('area_id', '=', $request['area_id'])
-            ->where('price', '>=', $request['minPrice'])
-            ->where('price', '<=', $request['maxPrice'])
+            ->where([
+                ['area_id', '=', $request['area_id']],
+                ['price', '>=', $request['minPrice']],
+                ['price', '<=', $request['maxPrice']],
+            ])
             ->orderBy('price')->get();
 
         return \response(new CourseCollection($filtered), 200);
