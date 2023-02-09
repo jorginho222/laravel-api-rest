@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\EnrollCourseRequest;
+use App\Http\Resources\EnrollmentResource;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -24,24 +25,24 @@ class EnrollmentController extends Controller
         $request->validated();
 
         $course = Course::query()->findOr($request['course_id'], function () {
-            abort(400, 'No se encuentra el curso');
+            abort(404, 'Course not found');
         });
 
-        $user = $this->checkStudentRole();
+        $user = \request()->user();
 
         if ($user->enrollments) {
             foreach ($user->enrollments as $enrollment) {
                 if ($enrollment->course_id === $course->id) {
-                    abort(400, 'El usuario ya se encuentra inscripto en este curso');
+                    abort(400, 'User has been enrolled on this course');
                 }
             }
         }
 
         if ($course->is_full) {
-            abort(400, sprintf('No hay cupo disponible para el curso: %s', $course->name));
+            abort(400, sprintf("There isn't available places for the course: %s", $course->name));
         }
 
-        $user->enrollments()->firstOrCreate($request->all());
+        $enrollment = $user->enrollments()->firstOrCreate($request->all());
 
         $course->available_places --;
 
@@ -51,7 +52,7 @@ class EnrollmentController extends Controller
 
         $course->save();
 
-        return \response($course, 200);
+        return \response(new EnrollmentResource($enrollment->load(['user', 'course'])), 200);
     }
 
     public function show($id)
@@ -67,16 +68,5 @@ class EnrollmentController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function checkStudentRole()
-    {
-        $user = \request()->user();
-
-        if (Bouncer::is($user)->notA('student')) {
-            abort(403, 'Solo los usuarios registrados como estudiantes pueden inscribirse');
-        }
-
-        return $user;
     }
 }

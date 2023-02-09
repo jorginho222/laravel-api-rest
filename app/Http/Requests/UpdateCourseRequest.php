@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class UpdateCourseRequest extends FormRequest
 {
@@ -13,6 +14,10 @@ class UpdateCourseRequest extends FormRequest
      */
     public function authorize()
     {
+        if (Bouncer::is($this->user())->notAn('instructor')) {
+            abort(403, 'Only instructors can manage the courses');
+        }
+
         return true;
     }
 

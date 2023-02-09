@@ -2,21 +2,24 @@
 
 namespace Tests\Feature\Http\Controllers;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-    public function test_example()
+    public function test_login()
     {
-        $response = $this->get('/');
+        $user = User::query()->whereHas('roles', function ($role) {
+            $role->where('name', '=', 'student');
+        })->first();
 
-        $response->assertStatus(200);
+        $credentials = [
+            'email' => $user->email,
+            'password' => 'password',
+        ];
+
+        $response = $this->post('/api/login', $credentials);
+
+        $response->assertJsonStructure(['access_token']);
     }
 }

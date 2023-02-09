@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DeleteCourseRequest;
 use App\Http\Requests\FilterRequest;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
+use App\Http\Resources\CourseCollection;
+use App\Http\Resources\CourseResource;
 use App\Models\Area;
 use App\Models\Course;
 use Illuminate\Http\Response;
-use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class CourseController extends Controller
 {
@@ -19,7 +21,7 @@ class CourseController extends Controller
     {
         $orderedByRating = Course::query()->orderBy('rating', 'desc')->get();
 
-        return response($orderedByRating->groupBy('area_id'), 200);
+        return response(new CourseCollection($orderedByRating), 200);
     }
 
     /**
@@ -32,12 +34,14 @@ class CourseController extends Controller
         $this->checkIfAreaExist($request['area_id']);
 
         $filtered = Course::query()
-            ->where('area_id', '=', $request['area_id'])
-            ->where('price', '>=', $request['minPrice'])
-            ->where('price', '<=', $request['maxPrice'])
+            ->where([
+                ['area_id', '=', $request['area_id']],
+                ['price', '>=', $request['minPrice']],
+                ['price', '<=', $request['maxPrice']],
+            ])
             ->orderBy('price')->get();
 
-        return \response($filtered, 200);
+        return \response(new CourseCollection($filtered), 200);
     }
 
     /**
@@ -47,9 +51,9 @@ class CourseController extends Controller
     {
         $request->validated();
 
-        $user = $this->checkInstructorRole();
-
         $this->checkIfAreaExist($request['area_id']);
+
+        $user = request()->user();
 
         $course = $user->courses()->firstOrCreate($request->all());
 
@@ -57,7 +61,7 @@ class CourseController extends Controller
 
         $course->save();
 
-        return response($course, 201);
+        return response(new CourseResource($course), 201);
     }
 
     /**
@@ -65,7 +69,7 @@ class CourseController extends Controller
      */
     public function show(Course $course): Response
     {
-        return \response($course->load(['ratings', 'user']), 200);
+        return \response(new CourseResource($course->load(['ratings', 'user'])), 200);
     }
 
     /**
@@ -75,44 +79,33 @@ class CourseController extends Controller
     {
         $request->validated();
 
-        $user = $this->checkInstructorRole();
+        $user = request()->user();
 
         if ($user->id !== $course->user_id) {
-            abort(403, 'Solo los propietarios del curso pueden editarlo');
+            abort(403, 'Only course owners can edit');
         }
 
         $this->checkIfAreaExist($request['area_id']);
 
         $course->update($request->all());
 
-        return \response($course, 200);
+        return response(new CourseResource($course), 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Course $course): Response
+    public function destroy(Course $course, DeleteCourseRequest $request): Response
     {
-        $user = $this->checkInstructorRole();
+        $user = request()->user();
 
         if ($user->id !== $course->user_id) {
-            abort(403, 'Solo los propietarios del curso pueden eliminarlo');
+            abort(403, 'Only course owners can delete');
         }
 
         $course->delete();
 
         return \response(null, 204);
-    }
-
-    public function checkInstructorRole()
-    {
-        $user = request()->user();
-
-        if (Bouncer::is($user)->notAn('instructor')) {
-            abort(403, 'Solo instructores pueden gestionar los cursos');
-        }
-
-        return $user;
     }
 
     public function checkIfAreaExist($areaId)

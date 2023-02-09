@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Silber\Bouncer\BouncerFacade as Bouncer;
 
-class StoreAreaRequest extends FormRequest
+class DeleteCourseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,8 +14,8 @@ class StoreAreaRequest extends FormRequest
      */
     public function authorize()
     {
-        if (Bouncer::is($this->user())->notAn('administrator')) {
-            abort(403, 'Only admins can manage the areas');
+        if (Bouncer::is($this->user())->notAn('instructor')) {
+            abort(403, 'Only instructors can manage the courses');
         }
 
         return true;
@@ -29,7 +29,7 @@ class StoreAreaRequest extends FormRequest
     public function rules()
     {
         return [
-            'description' => 'required|max:60',
+            //
         ];
     }
 }

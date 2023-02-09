@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class StoreRatingRequest extends FormRequest
 {
@@ -13,6 +14,10 @@ class StoreRatingRequest extends FormRequest
      */
     public function authorize()
     {
+        if (Bouncer::is($this->user())->notA('student')) {
+            abort(403, 'Only users registered as students can rate a course');
+        }
+
         return true;
     }
 

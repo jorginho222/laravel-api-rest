@@ -28,7 +28,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::apiResource('course', CourseController::class)->except(['index', 'show']);
 
-    Route::put('enrollment', [EnrollmentController::class, 'enroll']);
+    Route::post('enrollment', [EnrollmentController::class, 'enroll']);
 
     Route::post('rating', [RatingController::class, 'rate']);
 });

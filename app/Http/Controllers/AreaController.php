@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DeleteAreaRequest;
 use App\Http\Requests\StoreAreaRequest;
 use App\Http\Requests\UpdateAreaRequest;
+use App\Http\Resources\AreaResource;
 use App\Models\Area;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +20,7 @@ class AreaController extends Controller
      */
     public function index(): Response
     {
-        return \response(Area::all(), 200);
+        return \response(AreaResource::collection(Area::all()), 200);
     }
 
     /**
@@ -29,11 +30,11 @@ class AreaController extends Controller
     {
         $request->validated();
 
-        $user = $this->checkAdminRole();
+        $user = request()->user();
 
         $area = $user->areas()->create($request->all());
 
-        return \response($area, 201);
+        return \response(new AreaResource($area), 201);
     }
 
     /**
@@ -41,7 +42,7 @@ class AreaController extends Controller
      */
     public function show(Area $area): Area
     {
-        return $area->load('courses');
+        return $area->load(['courses']);
     }
 
     /**
@@ -51,33 +52,18 @@ class AreaController extends Controller
     {
         $request->validated();
 
-        $this->checkAdminRole();
-
         $area->update($request->all());
 
-        return \response($area, 200);
+        return \response(new AreaResource($area), 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Area $area): Response
+    public function destroy(Area $area, DeleteAreaRequest $request): Response
     {
-        $this->checkAdminRole();
-
         $area->delete();
 
         return \response(null, 204);
-    }
-
-    private function checkAdminRole()
-    {
-        $user = request()->user();
-
-        if (Bouncer::is($user)->notAn('administrator')) {
-            abort(403, 'Solo los administradores pueden gestionar las áreas');
-        }
-
-        return $user;
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRatingRequest;
+use App\Http\Resources\EnrollmentResource;
+use App\Http\Resources\RatingResource;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -18,11 +20,9 @@ class RatingController extends Controller
     {
         $request->validated();
 
-        $course = Course::query()->findOr($request['course_id'], function () {
-            abort(400, 'No se encuentra el curso');
-        });
+        $course = Course::query()->findOrFail($request['course_id']);
 
-        $user = $this->checkStudentRole();
+        $user = \request()->user();
 
         foreach ($user->ratings as $userRating) {
             if ($userRating->course_id === $course->id) {
@@ -32,25 +32,10 @@ class RatingController extends Controller
 
         $rating = $course->ratings()->firstOrCreate($request->all());
 
-        $count = $course->ratings->count();
-        $sum = $course->ratings->pluck('value')->sum();
-
-        $course->rating = $sum / $count;
+        $course->rating = $course->ratings->avg('value');
 
         $course->save();
 
-        return \response($rating, 200);
+        return \response(new RatingResource($rating->load(['course', 'user'])), 200);
     }
-
-    public function checkStudentRole()
-    {
-        $user = \request()->user();
-
-        if (Bouncer::is($user)->notA('student')) {
-            abort(403, 'Solo los usuarios registrados como estudiantes pueden inscribirse');
-        }
-
-        return $user;
-    }
-
 }
