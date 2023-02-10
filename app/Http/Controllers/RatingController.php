@@ -24,13 +24,10 @@ class RatingController extends Controller
 
         $user = \request()->user();
 
-        foreach ($user->ratings as $userRating) {
-            if ($userRating->course_id === $course->id) {
-                $userRating->update($request->all());
-            }
-        }
-
-        $rating = $course->ratings()->firstOrCreate($request->all());
+        $rating = $user->ratings()->updateOrCreate(
+            ['course_id' => $course->id],
+            $request->all()
+        );
 
         $course->rating = $course->ratings->avg('value');
 
