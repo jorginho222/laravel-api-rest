@@ -38,7 +38,7 @@ class AreaController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource
      */
     public function show(Area $area): Area
     {

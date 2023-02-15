@@ -42,7 +42,7 @@ class EnrollmentController extends Controller
             abort(400, sprintf("There isn't available places for the course: %s", $course->name));
         }
 
-        $enrollment = $user->enrollments()->firstOrCreate($request->all());
+        $enrollment = $user->enrollments()->create($request->all());
 
         $course->available_places --;
 
