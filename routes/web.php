@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\SendEmailJob;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,4 +16,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('email-test', function () {
+    $details['email'] = 'ramon@test.com';
+
+    dispatch(new SendEmailJob($details));
 });

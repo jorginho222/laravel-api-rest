@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -21,9 +22,11 @@ class CourseFactory extends Factory
             'id' => (string) Str::orderedUuid(),
             'name' => fake('pt_ES')->name(),
             'description' => fake('pt_ES')->text(255),
+            'init_date' => Carbon::now()->addDays(5),
             'price' => fake()->randomFloat(2, 0, 10000),
             'max_students' => rand(20, 60),
             'available_places' => rand(1, 20),
+            'modality' => fake()->randomElement(['presential', 'onlineLive', 'hybrid', 'onlineRecorded']),
             'rating' => rand(1, 5),
         ];
     }
