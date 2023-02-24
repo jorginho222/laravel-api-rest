@@ -52,7 +52,7 @@ class EnrollmentController extends Controller
 
         $course->save();
 
-        return \response(new EnrollmentResource($enrollment->load(['user', 'course'])), 200);
+        return \response(new EnrollmentResource($enrollment->load(['user', 'course'])), 201);
     }
 
     public function show($id)

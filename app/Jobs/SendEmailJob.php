@@ -34,7 +34,7 @@ class SendEmailJob implements ShouldQueue
      */
     public function handle()
     {
-        $email = new NotifyMail();
+        $email = new NotifyMail($this->details);
         Mail::to($this->details['email'])->send($email);
     }
 }

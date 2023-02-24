@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CourseModality;
 use App\Http\Requests\DeleteCourseRequest;
 use App\Http\Requests\FilterRequest;
 use App\Http\Requests\StoreCourseRequest;
@@ -36,6 +37,7 @@ class CourseController extends Controller
         $filtered = Course::query()
             ->where([
                 ['area_id', '=', $request['area_id']],
+                ['modality', '=', $request['modality']],
                 ['price', '>=', $request['minPrice']],
                 ['price', '<=', $request['maxPrice']],
             ])
@@ -52,6 +54,8 @@ class CourseController extends Controller
         $request->validated();
 
         $this->checkIfAreaExist($request['area_id']);
+
+        $this->checkIfModalityExist($request['modality']);
 
         $user = request()->user();
 
@@ -111,5 +115,12 @@ class CourseController extends Controller
     public function checkIfAreaExist($areaId)
     {
         Area::query()->findOrFail($areaId);
+    }
+
+    public function checkIfModalityExist($modality)
+    {
+        if (!in_array($modality, CourseModality::values())) {
+            abort(400, sprintf("Inexistent modality \" %s \"", $modality));
+        }
     }
 }

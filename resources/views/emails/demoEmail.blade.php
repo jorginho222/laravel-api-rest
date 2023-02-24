@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Laravel 9 Send Email Example</title>
+    <title>Course start date reminder</title>
 </head>
 <body>
 
-<h1>This is test mail from Tutsmake.com</h1>
-<p>Laravel 9 send email example</p>
+<h2>Dear {{ $userName }} </h2>
+<p>Don't forget the course you enrolled ({{ $course->name }}) starts in this date: {{ $course->init_date }}. Happy learning!</p>
 
 </body>
 </html>

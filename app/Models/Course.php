@@ -18,6 +18,8 @@ class Course extends Model
         'max_students',
         'price',
         'area_id',
+        'modality',
+        'init_date',
     ];
 
     public function area()

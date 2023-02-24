@@ -12,15 +12,16 @@ use Illuminate\Queue\SerializesModels;
 class NotifyMail extends Mailable
 {
     use Queueable, SerializesModels;
+    private $details;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($details)
     {
-        //
+        $this->details = $details;
     }
 
     /**
@@ -31,7 +32,7 @@ class NotifyMail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Notify Mail',
+            subject: 'Course start date reminder',
         );
     }
 
@@ -44,6 +45,10 @@ class NotifyMail extends Mailable
     {
         return new Content(
             view: 'emails.demoEmail',
+            with: [
+                'userName' => $this->details['userName'],
+                'course' => $this->details['course'],
+            ]
         );
     }
 

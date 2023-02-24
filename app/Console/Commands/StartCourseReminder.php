@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\SendEmailJob;
 use App\Models\Course;
+use App\Models\Enrollment;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -26,19 +27,18 @@ class StartCourseReminder extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle()
     {
-        $courses = Course::query()->where('init_date', '=', Carbon::now()->addDays(5));
+        $enrollments = Enrollment::query()->whereHas('course', function ($course) {
+            $course->where('init_date', '=', Carbon::now()->addDays(5)->format('y-m-d'));
+        })->get();
 
-        foreach ($courses as $course) {
-            $course->users->pluck('email');
-        }
-
-        foreach ($emails as $email) {
+        foreach ($enrollments as $enrollment) {
+            $email = $enrollment->user->email;
             $details['email'] = $email;
+            $details['userName'] = $enrollment->user->name;
+            $details['course'] = $enrollment->course;
             dispatch(new SendEmailJob($details));
         }
 

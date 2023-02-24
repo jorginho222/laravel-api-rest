@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\CourseModality;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -20,13 +21,13 @@ class CourseFactory extends Factory
     {
         return [
             'id' => (string) Str::orderedUuid(),
-            'name' => fake('pt_ES')->name(),
+            'name' => fake('pt_ES')->text(60),
             'description' => fake('pt_ES')->text(255),
-            'init_date' => Carbon::now()->addDays(5),
+            'init_date' => Carbon::now()->addDays(rand(3, 6)),
             'price' => fake()->randomFloat(2, 0, 10000),
             'max_students' => rand(20, 60),
             'available_places' => rand(1, 20),
-            'modality' => fake()->randomElement(['presential', 'onlineLive', 'hybrid', 'onlineRecorded']),
+            'modality' => fake()->randomElement(CourseModality::values()),
             'rating' => rand(1, 5),
         ];
     }
