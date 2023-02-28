@@ -47,7 +47,8 @@ class NotifyMail extends Mailable
             view: 'emails.demoEmail',
             with: [
                 'userName' => $this->details['userName'],
-                'course' => $this->details['course'],
+                'courseName' => $this->details['courseName'],
+                'initDate' => $this->details['initDate'],
             ]
         );
     }

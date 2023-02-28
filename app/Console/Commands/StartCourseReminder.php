@@ -38,7 +38,8 @@ class StartCourseReminder extends Command
             $email = $enrollment->user->email;
             $details['email'] = $email;
             $details['userName'] = $enrollment->user->name;
-            $details['course'] = $enrollment->course;
+            $details['courseName'] = $enrollment->course->name;
+            $details['initDate'] = $enrollment->course->init_date;
             dispatch(new SendEmailJob($details));
         }
 

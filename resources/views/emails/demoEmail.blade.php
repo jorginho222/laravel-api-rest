@@ -6,7 +6,7 @@
 <body>
 
 <h2>Dear {{ $userName }} </h2>
-<p>Don't forget the course you enrolled ({{ $course->name }}) starts in this date: {{ $course->init_date }}. Happy learning!</p>
+<p>Don't forget the course you enrolled ({{ $courseName }}) starts in this date: {{ $initDate }}. Happy learning!</p>
 
 </body>
 </html>
