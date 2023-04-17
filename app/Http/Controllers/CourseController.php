@@ -34,14 +34,22 @@ class CourseController extends Controller
 
         $this->checkIfAreaExist($request['area_id']);
 
-        $filtered = Course::query()
+        $this->checkIfModalityExist($request['modality']);
+
+        $filtered = Course::notFull()
             ->where([
-                ['area_id', '=', $request['area_id']],
-                ['modality', '=', $request['modality']],
                 ['price', '>=', $request['minPrice']],
                 ['price', '<=', $request['maxPrice']],
             ])
             ->orderBy('price')->get();
+
+        if ($request['area_id'] !== 'all') {
+            $filtered = $filtered->where('area_id', '=', $request['area_id']);
+        }
+
+        if ($request['modality'] !== 'all') {
+            $filtered = $filtered->where('modality', '=', $request['modality']);
+        }
 
         return \response(new CourseCollection($filtered), 200);
     }
@@ -114,12 +122,12 @@ class CourseController extends Controller
 
     public function checkIfAreaExist($areaId)
     {
-        Area::query()->findOrFail($areaId);
+        if ($areaId !== 'all') Area::query()->findOrFail($areaId);
     }
 
     public function checkIfModalityExist($modality)
     {
-        if (!in_array($modality, CourseModality::values())) {
+        if (!in_array($modality, CourseModality::values()) && $modality !== 'all') {
             abort(400, sprintf("Inexistent modality \" %s \"", $modality));
         }
     }

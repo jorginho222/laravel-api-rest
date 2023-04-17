@@ -9,7 +9,7 @@ enum CourseModality: string {
 
     use InvokableCases, Values;
 
-    case Presential = 'presential';
+    case FaceToFace = 'faceToFace';
     case OnlineLive = 'onlineLive';
     case OnlineRecorded = 'onlineRecorded';
     case Hybrid = 'hybrid';

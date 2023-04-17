@@ -24,7 +24,7 @@ class FilterRequest extends FormRequest
     public function rules()
     {
         return [
-            'area_id' => 'required|string|min:32|max:36',
+            'area_id' => 'required|string',
             'modality' => 'required|string',
             'minPrice' => 'required|numeric|min:1|max:100000',
             'maxPrice' => 'required|numeric|min:1|max:100000',

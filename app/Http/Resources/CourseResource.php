@@ -18,6 +18,7 @@ class CourseResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
+            'modality' => $this->modality,
             'max_students' => $this->max_students,
             'price' => $this->price,
             'rating' => (float) number_format($this->rating, 2),

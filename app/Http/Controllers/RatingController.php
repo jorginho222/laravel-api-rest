@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRatingRequest;
-use App\Http\Resources\EnrollmentResource;
 use App\Http\Resources\RatingResource;
 use App\Models\Course;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Silber\Bouncer\BouncerFacade as Bouncer;
+use Symfony\Component\HttpFoundation\Response as ResponseStatus;
 
 class RatingController extends Controller
 {
@@ -33,6 +30,6 @@ class RatingController extends Controller
 
         $course->save();
 
-        return \response(new RatingResource($rating->load(['course', 'user'])), 200);
+        return \response(new RatingResource($rating->load(['course', 'user'])), ResponseStatus::HTTP_CREATED);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Area;
 use App\Models\Course;
 use App\Models\Rating;
@@ -56,12 +55,12 @@ class DatabaseSeeder extends Seeder
         Bouncer::allow($admin)->to($manageAreas);
 
         // resources
-        $students = User::factory(200)
+        $students = User::factory(470)
             ->create()
             ->each(function ($user) {
                 $user->assign('student');
             });
-        $instructors = User::factory(10)
+        $instructors = User::factory(27)
             ->create()
             ->each(function ($user) {
                 $user->assign('instructor');
@@ -78,14 +77,14 @@ class DatabaseSeeder extends Seeder
                $area->user_id = $randAdmin->id;
                $area->save();
             });
-        $courses = Course::factory(10)
+        $courses = Course::factory(150)
             ->make()
             ->each(function ($course) use ($areas, $instructors) {
                 $course->area_id = $areas->random()->id;
                 $course->user_id = $instructors->random()->id;
                 $course->save();
             });
-        $ratings = Rating::factory(60)
+        $ratings = Rating::factory(500)
             ->make()
             ->each(function ($rating) use ($students, $courses) {
                $rating->course_id = $courses->random()->id;

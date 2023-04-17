@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('reminder:send')->daily();
+        $schedule->command('telescope:prune')->daily();
     }
 
     /**
