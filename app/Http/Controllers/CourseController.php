@@ -41,7 +41,7 @@ class CourseController extends Controller
                 ['price', '>=', $request['minPrice']],
                 ['price', '<=', $request['maxPrice']],
             ])
-            ->orderBy('price')->get();
+            ->orderBy('price');
 
         if ($request['area_id'] !== 'all') {
             $filtered = $filtered->where('area_id', '=', $request['area_id']);
@@ -51,7 +51,7 @@ class CourseController extends Controller
             $filtered = $filtered->where('modality', '=', $request['modality']);
         }
 
-        return \response(new CourseCollection($filtered), 200);
+        return \response(new CourseCollection($filtered->get()), 200);
     }
 
     /**
